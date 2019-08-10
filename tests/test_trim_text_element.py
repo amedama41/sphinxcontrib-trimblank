@@ -49,7 +49,6 @@ class TrimTextElementTest(unittest.TestCase):
         trim_text_element(self.text_elem, self.trimmer)
 
         self.assertEqual(self.text_elem.astext(), 'blank(あなたは私を食べる)')
-        self.trimmer.trim_blank.assert_called_once()
         self.trimmer.trim_head.assert_not_called()
         self.trimmer.trim_tail.assert_not_called()
 
