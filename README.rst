@@ -2,6 +2,9 @@
 sphinxcontrib-trimblank
 #######################
 
+.. image:: https://travis-ci.org/amedama41/sphinxcontrib-trimblank.svg?branch=master
+   :target: https://travis-ci.org/amedama41/sphinxcontrib-trimblank
+
 A Sphinx extension, which trims redundant blanks generated from
 line breaks or inline-markups in source reStructuredText.
 
