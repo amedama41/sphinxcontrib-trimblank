@@ -91,8 +91,13 @@ def trimblank(app, doctree, docname):
     else:
         logger = None
 
-    target_body_elems = (nodes.paragraph, nodes.line)
-    for node in doctree.traverse(lambda n: isinstance(n, target_body_elems)):
+    excluded_elems = (
+            nodes.FixedTextElement, nodes.Inline,
+            nodes.Invisible, nodes.Bibliographic)
+    target_body_elems = lambda n: (
+            isinstance(n, nodes.TextElement)
+            and not isinstance(n, excluded_elems))
+    for node in doctree.traverse(target_body_elems):
         trim_text_element(node, trimmer, logger=logger)
 
 
