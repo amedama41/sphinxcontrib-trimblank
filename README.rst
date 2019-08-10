@@ -48,12 +48,20 @@ Configuration
    * - variable
      - meaning
      - default
-   * - trimblank_keep_blank_for_alnum
-     - If this value is ``True``, the only blanks between non-ascii characters are trimmed.
-     - ``False``
    * - trimblank_enabled
-     - If this value is ``False``, no blanks are trimmed.
+     - A list of builder names ('html', 'singlehtml', 'latex', and so on).
+       Only when the builder in the list is used, sphinxcontrib-trimblank will
+       trim blanks.
+       The value may also be a boolean. Then the extension will do, or not do
+       for any builder.
      - ``True``
+   * - trimblank_keep_blank_for_alnum
+     - A list of builder names ('html', 'singlehtml', 'latex', and so on).
+       Only when the builder in the list is used, sphinxcontrib-trimblank will
+       keep blanks adjacent to an ascii character.
+       The value may also be a boolean. Then the extension will do, or not do
+       for any builder.
+     - ``False``
    * - trimblank_debug
      - If this value is ``True``, the trimmed texts are output as building messages.
      - ``False``

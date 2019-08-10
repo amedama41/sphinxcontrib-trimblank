@@ -73,10 +73,18 @@ def trim_text_element(node, trimmer, logger=None):
         node.replace(child, nodes.Text(new_txt, child.rawsource))
 
 
+def get_bool_value(config, builder_name):
+    if not isinstance(config, (list, tuple)):
+        return config
+    return builder_name in config
+
 def trimblank(app, doctree, docname):
-    if not app.config.trimblank_enabled:
+    builder_name = app.builder.name
+    if not get_bool_value(app.config.trimblank_enabled, builder_name):
         return
-    trimmer = Trimmer(app.config.trimblank_keep_blank_for_alnum)
+    keep_blank_for_alnum = get_bool_value(
+            app.config.trimblank_keep_blank_for_alnum, builder_name)
+    trimmer = Trimmer(keep_blank_for_alnum)
     if app.config.trimblank_debug:
         from sphinx.util import logging
         logger = logging.getLogger(__name__)
@@ -89,7 +97,8 @@ def trimblank(app, doctree, docname):
 
 
 def setup(app):
-    app.add_config_value('trimblank_enabled', True, 'env')
+    types = (bool, list, tuple)
+    app.add_config_value('trimblank_enabled', True, 'env', types)
+    app.add_config_value('trimblank_keep_blank_for_alnum', False, 'env', types)
     app.add_config_value('trimblank_debug', False, 'env')
-    app.add_config_value('trimblank_keep_blank_for_alnum', False, 'env')
     app.connect("doctree-resolved", trimblank)
