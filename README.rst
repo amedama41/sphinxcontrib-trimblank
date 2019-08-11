@@ -5,8 +5,7 @@ sphinxcontrib-trimblank
 .. image:: https://travis-ci.org/amedama41/sphinxcontrib-trimblank.svg?branch=master
    :target: https://travis-ci.org/amedama41/sphinxcontrib-trimblank
 
-A Sphinx extension, which trims redundant blanks generated from
-line breaks or inline-markups in source reStructuredText.
+A Sphinx extension, which trims redundant blanks generated due to line breaks or inline-markups from generated documents.
 
 .. note::
 
@@ -20,24 +19,30 @@ line breaks or inline-markups in source reStructuredText.
 Install
 *******
 
-Install by setup.py:
+Use pip:
 
 .. code:: sh
 
-   python setup.py install
+   pip install sphinxcontrib-trimblank
 
 *****
 Usage
 *****
 
-Only add 'sphinxcontrib.trimblank' to ``extensions`` configuration of **conf.py**:
+Only add 'sphinxcontrib.trimblank' to ``extensions`` option in **conf.py**:
 
 .. code:: python
 
    extensions += ['sphinxcontrib.trimblank']
 
-If you want to change the extension behaviour, change the configuration variable's value in **conf.py**.
-All configuration variables are listed in `Configuration`_.
+If you want to change the extension behaviour, configure options in **conf.py**:
+
+.. code:: python
+
+   # Keep blanks to adjacent to ascii characters in html documents
+   trimblank_keep_alnum_blank = ['html', 'singlehtml']
+
+All options are listed in `Configuration`_.
 
 Configuration
 =============
@@ -45,7 +50,7 @@ Configuration
 .. list-table::
    :header-rows: 1
 
-   * - variable
+   * - option name
      - meaning
      - default
    * - trimblank_enabled
