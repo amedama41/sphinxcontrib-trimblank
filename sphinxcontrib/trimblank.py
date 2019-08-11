@@ -18,8 +18,8 @@ class Trimmer(object):
             re.compile(r'{}\s$'.format(CJK_RANGE)),
             re.compile(r'^{}'.format(CJK_RANGE)))
 
-    def __init__(self, keep_blank_for_alnum):
-        if keep_blank_for_alnum:
+    def __init__(self, keep_alnum_blank):
+        if keep_alnum_blank:
             pattern = r'(?<={0})[\s](?={0})'
             self._condition = all
         else:
@@ -82,9 +82,9 @@ def trimblank(app, doctree, docname):
     builder_name = app.builder.name
     if not get_bool_value(app.config.trimblank_enabled, builder_name):
         return
-    keep_blank_for_alnum = get_bool_value(
-            app.config.trimblank_keep_blank_for_alnum, builder_name)
-    trimmer = Trimmer(keep_blank_for_alnum)
+    keep_alnum_blank = get_bool_value(
+            app.config.trimblank_keep_alnum_blank, builder_name)
+    trimmer = Trimmer(keep_alnum_blank)
     if app.config.trimblank_debug:
         from sphinx.util import logging
         logger = logging.getLogger(__name__)
@@ -104,6 +104,6 @@ def trimblank(app, doctree, docname):
 def setup(app):
     types = (bool, list, tuple)
     app.add_config_value('trimblank_enabled', True, 'env', types)
-    app.add_config_value('trimblank_keep_blank_for_alnum', False, 'env', types)
+    app.add_config_value('trimblank_keep_alnum_blank', False, 'env', types)
     app.add_config_value('trimblank_debug', False, 'env')
     app.connect("doctree-resolved", trimblank)

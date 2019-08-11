@@ -55,7 +55,7 @@ Configuration
        The value may also be a boolean. Then the extension will do, or not do
        for any builder.
      - ``True``
-   * - trimblank_keep_blank_for_alnum
+   * - trimblank_keep_alnum_blank
      - A list of builder names ('html', 'singlehtml', 'latex', and so on).
        Only when the builder in the list is used, sphinxcontrib-trimblank will
        keep blanks adjacent to an ascii character.
