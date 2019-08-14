@@ -49,28 +49,49 @@ class Trimmer(object):
             patterns[1].search(leading_txt), patterns[2].match(following_txt)))
 
 
-def trim_text_element(node, trimmer, logger=None):
-    target_inline_elems = (nodes.emphasis, nodes.strong)
-    num_children = len(node.children)
-    for idx, child in enumerate(node.children):
-        if not isinstance(child, nodes.Text):
-            if isinstance(child, target_inline_elems):
-                trim_text_element(child, trimmer, logger)
-                pass
-            continue
-        new_txt = trimmer.trim_blank(child.astext())
-        if idx - 1 >= 0:
-            prev_txt = node.children[idx - 1].astext()
-            new_txt = trimmer.trim_head(new_txt, prev_txt)
-        if idx + 1 < num_children:
-            next_txt = node.children[idx + 1].astext()
-            new_txt = trimmer.trim_tail(new_txt, next_txt)
+class TrimblankVisitor(nodes.GenericNodeVisitor):
+    EXCLUDED_ELEMENTS = (
+            nodes.FixedTextElement, nodes.Inline,
+            nodes.Invisible, nodes.Bibliographic)
 
-        if logger is not None and child.astext() != new_txt:
-            logger.info(
-                    '\nBefore : %s\nAfter  : %s',
-                    child.astext(), new_txt, location=child)
-        node.replace(child, nodes.Text(new_txt, child.rawsource))
+    def __init__(self, document, trimmer, logger=None):
+        super(TrimblankVisitor, self).__init__(document)
+        self._trimmer = trimmer
+        self._logger = logger
+
+    def default_visit(self, node):
+        if not isinstance(node, nodes.TextElement):
+            return
+        if isinstance(node, TrimblankVisitor.EXCLUDED_ELEMENTS):
+            return
+        self._trim_blank(node)
+        raise nodes.SkipChildren
+
+    def unknown_visit(self, node):
+        self.default_visit(node)
+
+    def _trim_blank(self, node):
+        target_inline_elems = (nodes.emphasis, nodes.strong)
+        num_children = len(node.children)
+        for idx, child in enumerate(node.children):
+            if not isinstance(child, nodes.Text):
+                if isinstance(child, target_inline_elems):
+                    self._trim_blank(child)
+                    pass
+                continue
+            new_txt = self._trimmer.trim_blank(child.astext())
+            if idx - 1 >= 0:
+                prev_txt = node.children[idx - 1].astext()
+                new_txt = self._trimmer.trim_head(new_txt, prev_txt)
+            if idx + 1 < num_children:
+                next_txt = node.children[idx + 1].astext()
+                new_txt = self._trimmer.trim_tail(new_txt, next_txt)
+
+            if self._logger is not None and child.astext() != new_txt:
+                self._logger.info(
+                        '\nBefore : %s\nAfter  : %s',
+                        child.astext(), new_txt, location=child)
+            node.replace(child, nodes.Text(new_txt, child.rawsource))
 
 
 def get_bool_value(config, builder_name):
@@ -91,14 +112,8 @@ def trimblank(app, doctree, docname):
     else:
         logger = None
 
-    excluded_elems = (
-            nodes.FixedTextElement, nodes.Inline,
-            nodes.Invisible, nodes.Bibliographic)
-    target_body_elems = lambda n: (
-            isinstance(n, nodes.TextElement)
-            and not isinstance(n, excluded_elems))
-    for node in doctree.traverse(target_body_elems):
-        trim_text_element(node, trimmer, logger=logger)
+    visitor = TrimblankVisitor(doctree, trimmer, logger)
+    doctree.walk(visitor)
 
 
 def setup(app):
