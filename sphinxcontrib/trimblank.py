@@ -125,3 +125,4 @@ def setup(app):
     app.add_config_value('trimblank_keep_alnum_blank', False, 'env', types)
     app.add_config_value('trimblank_debug', False, 'env')
     app.connect("doctree-resolved", trimblank)
+    return { 'parallel_read_safe': True, 'parallel_write_safe': True }
