@@ -9,23 +9,26 @@ class Trimmer(object):
             r'\uFF00-\uFF60\uFFE0-\uFFE6' # Halfwidth and Fullwidth Forms
             r'\U00020000-\U0003FFFF' # Supplementary, Tertiary Ideographic Plane
             r']')
+    # Blanks after this pattern are always kept.
+    EXCLUSION_PATTERN = r'[,.\s]'
     HEAD_PATTERNS = (
-            re.compile(r'^\s\s'),
+            re.compile(r'^{}\s'.format(EXCLUSION_PATTERN)),
             re.compile(r'{}$'.format(CJK_RANGE)),
             re.compile(r'^\s{}'.format(CJK_RANGE)))
     TAIL_PATTERNS = (
-            re.compile(r'\s\s$'),
+            re.compile(r'{}\s$'.format(EXCLUSION_PATTERN)),
             re.compile(r'{}\s$'.format(CJK_RANGE)),
             re.compile(r'^{}'.format(CJK_RANGE)))
 
     def __init__(self, keep_alnum_blank):
         if keep_alnum_blank:
-            pattern = r'(?<={0})[\s](?={0})'
+            pattern = r'(?<={0})\s(?={0})'
             self._condition = all
         else:
-            pattern = r'(?<={0})[\s](?!\s)|(?<!\s)[\s](?={0})'
+            pattern = r'(?<={0})\s(?!{1})|(?<!{1})\s(?={0})'
             self._condition = any
-        self._pattern = re.compile(pattern.format(Trimmer.CJK_RANGE))
+        self._pattern = re.compile(
+                pattern.format(Trimmer.CJK_RANGE, Trimmer.EXCLUSION_PATTERN))
 
     def trim_blank(self, target_txt):
         return self._pattern.sub('', target_txt)
