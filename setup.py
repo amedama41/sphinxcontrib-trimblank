@@ -5,13 +5,13 @@ from setuptools import setup
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 with open(os.path.join(BASE_DIR, "README.rst")) as f:
-    long_description = f.read()
+    LONG_DESCRIPTION = f.read()
 
 setup(
     name='sphinxcontrib-trimblank',
-    version='1.0.1',
+    version='1.0.2',
     description='A Sphinx extension which trims redundant blanks',
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     url='https://github.com/amedama41/sphinxcontrib-trimblank',
     author='amedama41',
     author_email='kamo.devel41@gmail.com',
