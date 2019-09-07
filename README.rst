@@ -67,6 +67,14 @@ Configuration
        The value may also be a boolean. Then the extension will do, or not do
        for any builder.
      - ``False``
+   * - trimblank_keep_blank_before
+     - A regular expression pattern string to specified characters, which
+       sphinxcontrib-trimblank will keep blanks just before.
+     - ``'[\s(]'``
+   * - trimblank_keep_blank_after
+     - A regular expression pattern string to specified characters, which
+       sphinxcontrib-trimblank will keep blanks just after.
+     - ``'[\s),.:?]'``
    * - trimblank_debug
      - If this value is ``True``, the trimmed texts are output as building messages.
      - ``False``
