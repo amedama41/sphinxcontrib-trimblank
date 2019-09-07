@@ -3,7 +3,7 @@ from sphinxcontrib.trimblank import Trimmer
 
 class TrimmerWithoutKeepBlankTest(unittest.TestCase):
     def setUp(self):
-        self.sut = Trimmer(False)
+        self.sut = Trimmer(False, '[:\s]', '[,.\s]')
 
     def test_trim_blank(self):
         datalist = [
@@ -22,6 +22,9 @@ class TrimmerWithoutKeepBlankTest(unittest.TestCase):
                 ('あなたは. 私を. 食べる', 'あなたは. 私を. 食べる'),
                 ('You. は. me. を食べる', 'You. は. me. を食べる'),
                 ('You. eat. me', 'You. eat. me'),
+                ('あなたは :私を :食べる', 'あなたは :私を :食べる'),
+                ('You :は :me :を食べる', 'You :は :me :を食べる'),
+                ('You :eat :me', 'You :eat :me'),
                 (' ', ' '),
                 ('', ''),
         ]
@@ -42,6 +45,9 @@ class TrimmerWithoutKeepBlankTest(unittest.TestCase):
                 ('あなたは', '  私を食べる', '  私を食べる'),
                 ('You', '  は me を食べる', '  は me を食べる'),
                 ('You', '  eat me', '  eat me'),
+                ('あなたは', ' :私を食べる', ' :私を食べる'),
+                ('You', ' :は me を食べる', ' :は me を食べる'),
+                ('You', ' :eat me', ' :eat me'),
                 ('あなたは', ' ', ''),
                 ('You', ' ', ' '),
                 ('You', ' ', ' '),
@@ -87,7 +93,7 @@ class TrimmerWithoutKeepBlankTest(unittest.TestCase):
 
 class TrimmerWithKeepBlankTest(unittest.TestCase):
     def setUp(self):
-        self.sut = Trimmer(True)
+        self.sut = Trimmer(True, '[:\s]', '[,.\s]')
 
     def test_trim_blank(self):
         datalist = [
@@ -106,6 +112,9 @@ class TrimmerWithKeepBlankTest(unittest.TestCase):
                 ('あなたは. 私を. 食べる', 'あなたは. 私を. 食べる'),
                 ('You. は. me. を食べる', 'You. は. me. を食べる'),
                 ('You. eat. me', 'You. eat. me'),
+                ('あなたは :私を :食べる', 'あなたは :私を :食べる'),
+                ('You :は :me :を食べる', 'You :は :me :を食べる'),
+                ('You :eat :me', 'You :eat :me'),
                 (' ', ' '),
                 ('', ''),
         ]
@@ -126,6 +135,9 @@ class TrimmerWithKeepBlankTest(unittest.TestCase):
                 ('あなたは', '  私を食べる', '  私を食べる'),
                 ('You', '  は me を食べる', '  は me を食べる'),
                 ('You', '  eat me', '  eat me'),
+                ('あなたは', ' :私を食べる', ' :私を食べる'),
+                ('You', ' :は me を食べる', ' :は me を食べる'),
+                ('You', ' :eat me', ' :eat me'),
                 ('あなたは', ' ', ' '),
                 ('You', ' ', ' '),
                 ('You', ' ', ' '),

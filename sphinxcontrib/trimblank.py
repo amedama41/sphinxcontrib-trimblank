@@ -10,38 +10,37 @@ class Trimmer(object):
             r'\U00020000-\U0003FFFF' # Supplementary, Tertiary Ideographic Plane
             r']')
     # Blanks after this pattern are always kept.
-    EXCLUSION_PATTERN = r'[,.\s]'
     HEAD_PATTERNS = (
-            re.compile(r'^{}\s'.format(EXCLUSION_PATTERN)),
             re.compile(r'{}$'.format(CJK_RANGE)),
             re.compile(r'^\s{}'.format(CJK_RANGE)))
     TAIL_PATTERNS = (
-            re.compile(r'{}\s$'.format(EXCLUSION_PATTERN)),
             re.compile(r'{}\s$'.format(CJK_RANGE)),
             re.compile(r'^{}'.format(CJK_RANGE)))
 
-    def __init__(self, keep_alnum_blank):
+    def __init__(self, keep_alnum_blank, keep_blank_before, keep_blank_after):
         if keep_alnum_blank:
             pattern = r'(?<={0})\s(?={0})'
             self._condition = all
         else:
-            pattern = r'(?<={0})\s(?!{1})|(?<!{1})\s(?={0})'
+            pattern = (r'(?<={0})\s(?!%s)|(?<!%s)\s(?={0})'
+                    % (keep_blank_before, keep_blank_after))
             self._condition = any
-        self._pattern = re.compile(
-                pattern.format(Trimmer.CJK_RANGE, Trimmer.EXCLUSION_PATTERN))
+        self._pattern = re.compile(pattern.format(Trimmer.CJK_RANGE))
+        self._head_exlusion_pattern = re.compile(r'^\s%s' % keep_blank_before)
+        self._tail_exlusion_pattern = re.compile(r'%s\s$' % keep_blank_after)
 
     def trim_blank(self, target_txt):
         return self._pattern.sub('', target_txt)
 
     def trim_head(self, target_txt, leading_txt):
-        if Trimmer.HEAD_PATTERNS[0].match(target_txt):
+        if self._head_exlusion_pattern.match(target_txt):
             return target_txt
         if not self._check(leading_txt, target_txt, Trimmer.HEAD_PATTERNS):
             return target_txt
         return target_txt.lstrip()
 
     def trim_tail(self, target_txt, following_txt):
-        if Trimmer.TAIL_PATTERNS[0].search(target_txt):
+        if self._tail_exlusion_pattern.search(target_txt):
             return target_txt
         if not self._check(target_txt, following_txt, Trimmer.TAIL_PATTERNS):
             return target_txt
@@ -49,7 +48,7 @@ class Trimmer(object):
 
     def _check(self, leading_txt, following_txt, patterns):
         return self._condition((
-            patterns[1].search(leading_txt), patterns[2].match(following_txt)))
+            patterns[0].search(leading_txt), patterns[1].match(following_txt)))
 
 
 class TrimblankVisitor(nodes.GenericNodeVisitor):
@@ -108,7 +107,9 @@ def trimblank(app, doctree, docname):
         return
     keep_alnum_blank = get_bool_value(
             app.config.trimblank_keep_alnum_blank, builder_name)
-    trimmer = Trimmer(keep_alnum_blank)
+    trimmer = Trimmer(keep_alnum_blank,
+                      app.config.trimblank_keep_blank_before,
+                      app.config.trimblank_keep_blank_after)
     if app.config.trimblank_debug:
         from sphinx.util import logging
         logger = logging.getLogger(__name__)
@@ -123,6 +124,8 @@ def setup(app):
     types = (bool, list, tuple)
     app.add_config_value('trimblank_enabled', True, 'env', types)
     app.add_config_value('trimblank_keep_alnum_blank', False, 'env', types)
+    app.add_config_value('trimblank_keep_blank_before', r'[\s(]', 'env', str)
+    app.add_config_value('trimblank_keep_blank_after', r'[\s),.:?]', 'env', str)
     app.add_config_value('trimblank_debug', False, 'env')
     app.connect("doctree-resolved", trimblank)
     return { 'parallel_read_safe': True, 'parallel_write_safe': True }
