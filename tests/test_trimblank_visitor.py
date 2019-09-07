@@ -17,7 +17,7 @@ class TrimblankVisitorTest(unittest.TestCase):
         self.text_elem.extend(elems)
 
         self.assertRaises(
-                nodes.SkipChildren, self.sut.default_visit, self.text_elem)
+            nodes.SkipChildren, self.sut.default_visit, self.text_elem)
 
         self.assertEqual(self.text_elem.astext(), '')
         self.trimmer.trim_blank.assert_not_called()
@@ -29,7 +29,7 @@ class TrimblankVisitorTest(unittest.TestCase):
         self.text_elem.extend(elems)
 
         self.assertRaises(
-                nodes.SkipChildren, self.sut.default_visit, self.text_elem)
+            nodes.SkipChildren, self.sut.default_visit, self.text_elem)
 
         self.assertEqual(self.text_elem.astext(), 'blank(あなたは私を食べる)')
         self.trimmer.trim_head.assert_not_called()
@@ -40,18 +40,18 @@ class TrimblankVisitorTest(unittest.TestCase):
         self.text_elem.extend(elems)
 
         self.assertRaises(
-                nodes.SkipChildren, self.sut.default_visit, self.text_elem)
+            nodes.SkipChildren, self.sut.default_visit, self.text_elem)
 
         self.assertEqual(
-                self.text_elem.astext(),
-                'tail(blank(あなたは))head(blank(私を食べる))')
+            self.text_elem.astext(),
+            'tail(blank(あなたは))head(blank(私を食べる))')
 
     def test_with_single_inline_element(self):
         elems = [nodes.strong(text='あなたは私を食べる')]
         self.text_elem.extend(elems)
 
         self.assertRaises(
-                nodes.SkipChildren, self.sut.default_visit, self.text_elem)
+            nodes.SkipChildren, self.sut.default_visit, self.text_elem)
 
         self.assertEqual(self.text_elem.astext(), 'blank(あなたは私を食べる)')
         self.trimmer.trim_head.assert_not_called()
@@ -59,34 +59,32 @@ class TrimblankVisitorTest(unittest.TestCase):
 
     def test_with_multiple_inline_element(self):
         elems = [
-                nodes.strong(text='あなたは'),
-                nodes.emphasis(text='私を食べる')
+            nodes.strong(text='あなたは'),
+            nodes.emphasis(text='私を食べる')
         ]
         self.text_elem.extend(elems)
 
         self.assertRaises(
-                nodes.SkipChildren, self.sut.default_visit, self.text_elem)
+            nodes.SkipChildren, self.sut.default_visit, self.text_elem)
 
         self.assertEqual(
-                self.text_elem.astext(),
-                'blank(あなたは)blank(私を食べる)')
+            self.text_elem.astext(), 'blank(あなたは)blank(私を食べる)')
         self.trimmer.trim_head.assert_not_called()
         self.trimmer.trim_tail.assert_not_called()
 
     def test_with_multiple_nested_inline_element(self):
         elems = [
-                nodes.strong(
-                    '', '',
-                    nodes.Text('あなたは'), nodes.emphasis(text='私を食べる'))
+            nodes.strong(
+                '', '',
+                nodes.Text('あなたは'), nodes.emphasis(text='私を食べる'))
         ]
         self.text_elem.extend(elems)
 
         self.assertRaises(
-                nodes.SkipChildren, self.sut.default_visit, self.text_elem)
+            nodes.SkipChildren, self.sut.default_visit, self.text_elem)
 
         self.assertEqual(
-                self.text_elem.astext(),
-                'tail(blank(あなたは))blank(私を食べる)')
+            self.text_elem.astext(), 'tail(blank(あなたは))blank(私を食べる)')
 
     def test_with_non_text_element(self):
         for elem_cls in (nodes.bullet_list, nodes.field, nodes.note):
@@ -138,8 +136,8 @@ class TrimblankVisitorTest(unittest.TestCase):
         self.text_elem.extend(elems)
 
         self.assertRaises(
-                nodes.SkipChildren, self.sut.unknown_visit, self.text_elem)
+            nodes.SkipChildren, self.sut.unknown_visit, self.text_elem)
 
         self.assertEqual(
-                self.text_elem.astext(),
-                'tail(blank(あなたは))head(blank(私を食べる))')
+            self.text_elem.astext(),
+            'tail(blank(あなたは))head(blank(私を食べる))')

@@ -3,19 +3,19 @@ from docutils import nodes
 
 class Trimmer(object):
     CJK_RANGE = (
-            r'['
-            r'\u2E80-\u9FFF'
-            r'\uF900-\uFAFF'    # CJK Compatibility Ideographs
-            r'\uFF00-\uFF60\uFFE0-\uFFE6' # Halfwidth and Fullwidth Forms
-            r'\U00020000-\U0003FFFF' # Supplementary, Tertiary Ideographic Plane
-            r']')
+        r'['
+        r'\u2E80-\u9FFF'
+        r'\uF900-\uFAFF'    # CJK Compatibility Ideographs
+        r'\uFF00-\uFF60\uFFE0-\uFFE6' # Halfwidth and Fullwidth Forms
+        r'\U00020000-\U0003FFFF' # Supplementary, Tertiary Ideographic Plane
+        r']')
     # Blanks after this pattern are always kept.
     HEAD_PATTERNS = (
-            re.compile(r'{}$'.format(CJK_RANGE)),
-            re.compile(r'^\s{}'.format(CJK_RANGE)))
+        re.compile(r'{}$'.format(CJK_RANGE)),
+        re.compile(r'^\s{}'.format(CJK_RANGE)))
     TAIL_PATTERNS = (
-            re.compile(r'{}\s$'.format(CJK_RANGE)),
-            re.compile(r'^{}'.format(CJK_RANGE)))
+        re.compile(r'{}\s$'.format(CJK_RANGE)),
+        re.compile(r'^{}'.format(CJK_RANGE)))
 
     def __init__(self, keep_alnum_blank, keep_blank_before, keep_blank_after):
         if keep_alnum_blank:
@@ -23,7 +23,7 @@ class Trimmer(object):
             self._condition = all
         else:
             pattern = (r'(?<={0})\s(?!%s)|(?<!%s)\s(?={0})'
-                    % (keep_blank_before, keep_blank_after))
+                       % (keep_blank_before, keep_blank_after))
             self._condition = any
         self._pattern = re.compile(pattern.format(Trimmer.CJK_RANGE))
         self._head_exlusion_pattern = re.compile(r'^\s%s' % keep_blank_before)
@@ -53,8 +53,8 @@ class Trimmer(object):
 
 class TrimblankVisitor(nodes.GenericNodeVisitor):
     EXCLUDED_ELEMENTS = (
-            nodes.FixedTextElement, nodes.Inline,
-            nodes.Invisible, nodes.Bibliographic)
+        nodes.FixedTextElement, nodes.Inline,
+        nodes.Invisible, nodes.Bibliographic)
 
     def __init__(self, document, trimmer, logger=None):
         super(TrimblankVisitor, self).__init__(document)
@@ -69,6 +69,9 @@ class TrimblankVisitor(nodes.GenericNodeVisitor):
         self._trim_blank(node)
         raise nodes.SkipChildren
 
+    def default_departure(self, _node):
+        assert False, 'Never use depature method'
+
     def unknown_visit(self, node):
         self.default_visit(node)
 
@@ -79,7 +82,6 @@ class TrimblankVisitor(nodes.GenericNodeVisitor):
             if not isinstance(child, nodes.Text):
                 if isinstance(child, target_inline_elems):
                     self._trim_blank(child)
-                    pass
                 continue
             new_txt = self._trimmer.trim_blank(child.astext())
             if idx - 1 >= 0:
@@ -91,8 +93,8 @@ class TrimblankVisitor(nodes.GenericNodeVisitor):
 
             if self._logger is not None and child.astext() != new_txt:
                 self._logger.info(
-                        '\nBefore : %s\nAfter  : %s',
-                        child.astext(), new_txt, location=child)
+                    '\nBefore : %s\nAfter  : %s',
+                    child.astext(), new_txt, location=child)
             node.replace(child, nodes.Text(new_txt, child.rawsource))
 
 
@@ -101,12 +103,12 @@ def get_bool_value(config, builder_name):
         return config
     return builder_name in config
 
-def trimblank(app, doctree, docname):
+def trimblank(app, doctree, _docname):
     builder_name = app.builder.name
     if not get_bool_value(app.config.trimblank_enabled, builder_name):
         return
     keep_alnum_blank = get_bool_value(
-            app.config.trimblank_keep_alnum_blank, builder_name)
+        app.config.trimblank_keep_alnum_blank, builder_name)
     trimmer = Trimmer(keep_alnum_blank,
                       app.config.trimblank_keep_blank_before,
                       app.config.trimblank_keep_blank_after)
@@ -128,4 +130,4 @@ def setup(app):
     app.add_config_value('trimblank_keep_blank_after', r'[\s),.:?]', 'env', str)
     app.add_config_value('trimblank_debug', False, 'env')
     app.connect("doctree-resolved", trimblank)
-    return { 'parallel_read_safe': True, 'parallel_write_safe': True }
+    return {'parallel_read_safe': True, 'parallel_write_safe': True}
