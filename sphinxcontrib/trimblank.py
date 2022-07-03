@@ -95,7 +95,7 @@ class TrimblankVisitor(nodes.GenericNodeVisitor):
                 self._logger.info(
                     '\nBefore : %s\nAfter  : %s',
                     child.astext(), new_txt, location=child)
-            node.replace(child, nodes.Text(new_txt, child.astext()))
+            node.replace(child, nodes.Text(new_txt))
 
 
 def get_bool_value(config, builder_name):
