@@ -9,7 +9,7 @@ with open(os.path.join(BASE_DIR, "README.rst")) as f:
 
 setup(
     name='sphinxcontrib-trimblank',
-    version='1.0.2',
+    version='1.0.3',
     description='A Sphinx extension which trims redundant blanks',
     long_description=LONG_DESCRIPTION,
     url='https://github.com/amedama41/sphinxcontrib-trimblank',
